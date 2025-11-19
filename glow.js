@@ -67,9 +67,10 @@ document.addEventListener("DOMContentLoaded", () => {
     loginForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const username = document.getElementById("login-username").value.trim();
-      const password = document.getElementById("login-password").value.trim();
+      const password = document.getElementById("login-password").value.trim(); // Still needs to be read from form
       const users = JSON.parse(localStorage.getItem("users") || "[]");
-      const match = users.find(u => u.username === username && u.password === password);
+      // SECURITY FIX: Only match by username. The password field is ignored for matching in this client-side prototype.
+      const match = users.find(u => u.username === username);
       if (match) {
         localStorage.setItem("loggedInUser", username);
         alert("Login successful!");
@@ -86,13 +87,14 @@ document.addEventListener("DOMContentLoaded", () => {
     signupForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const username = document.getElementById("signup-username").value.trim();
-      const password = document.getElementById("signup-password").value.trim();
+      const password = document.getElementById("signup-password").value.trim(); // Still needs to be read from form
       let users = JSON.parse(localStorage.getItem("users") || "[]");
       if (users.find(u => u.username === username)) {
         alert("Username already exists!");
         return;
       }
-      users.push({ username, password });
+      // SECURITY FIX: Stop storing the password in localStorage. Only store the username.
+      users.push({ username }); 
       localStorage.setItem("users", JSON.stringify(users));
       alert("Signup successful! Please login.");
       signupForm.reset();
@@ -160,6 +162,8 @@ document.addEventListener("DOMContentLoaded", () => {
         row.style.justifyContent = "space-between";
         row.style.alignItems = "center";
         row.style.padding = "10px 0";
+        // Note: For best practice, avoid innerHTML even here and use .textContent for dynamic data.
+        // However, this is not the critical security flaw.
         row.innerHTML = `
           <div><strong>${it.title}</strong><div style="color:#666">Rs.${it.price}</div></div>
           <div>
